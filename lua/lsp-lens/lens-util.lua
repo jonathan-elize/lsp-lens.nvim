@@ -29,37 +29,37 @@ local function requests_done(finished)
   return true
 end
 
--- enum 
-local SymbolKind = {
-	Class = 5,
-	Methods = 6,
-	Interface = 11,
-	Function = 12,
-	Struct = 23,
-}
+local tableHasValue = function(table, targetValue)
+  for _, value in ipairs(table) do
+    if value == targetValue then
+      return true
+    end
+  end
+  return false
+end
 
 local function get_functions(result)
   local ret = {}
   for _, v in pairs(result or {}) do
-    local is_wrapper_structure = v.kind == SymbolKind.Class
-        or v.kind == SymbolKind.Struct
-        or v.kind == SymbolKind.Interface
 
-    if
-        v.kind == SymbolKind.Function
-        or v.kind == SymbolKind.Methods
-        or v.kind == SymbolKind.Interface
-        or is_wrapper_structure
+    if tableHasValue(config.config.kinds_to_include, v.kind)
+        or v.kind == config.SymbolKind.Constant and v.name ~= 'default'
     then
       table.insert(ret, {
         name = v.name,
         rangeStart = v.range.start,
         selectionRangeStart = v.selectionRange.start,
         selectionRangeEnd = v.selectionRange["end"],
+        kind = v.kind,
       })
+      -- if(v.name == 'default') then
+      --   vim.pretty_print(v)
+      -- end
+    else
+      vim.pretty_print(v.kind)
     end
 
-    if is_wrapper_structure then
+    if tableHasValue(config.config.recursive_kinds_to_include, v.kind) then
       ret = utils:merge_table(ret, get_functions(v.children)) -- Recursively find methods
     end
   end
