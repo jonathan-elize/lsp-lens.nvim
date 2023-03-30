@@ -126,11 +126,12 @@ local function display_lines(bufnr, query_results)
       create_string(query.counting)
     end
     if not (display_str == "") then
-      local vline = {string.rep(" ", query.rangeStart.character) .. display_str, "LspLens"}
-      table.insert(virt_lines, vline)
+      -- local vline = {{string.rep(" ", query.rangeStart.character) .. display_str, "LspLens"}}
+      -- table.insert(virt_lines, vline)
+      local vtext = {string.rep(" ", 4) .. display_str, "LspLens"}
+      table.insert(virt_lines, vtext)
       vim.api.nvim_buf_set_extmark(bufnr, ns_id, query.rangeStart.line, 0, {
-        virt_lines = virt_lines,
-        virt_lines_above = true
+        virt_text = virt_lines,
       })
     end
   end
