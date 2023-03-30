@@ -56,7 +56,7 @@ local function get_functions(result)
       --   vim.pretty_print(v)
       -- end
     else
-      vim.pretty_print(v.kind)
+      -- vim.pretty_print(v.kind)
     end
 
     if tableHasValue(config.config.recursive_kinds_to_include, v.kind) then
@@ -119,9 +119,14 @@ local function display_lines(bufnr, query_results)
   delete_existing_lines(bufnr, ns_id)
   for _, query in pairs(query_results or {}) do
     local virt_lines = {}
-    local display_str = create_string(query.counting)
+    local display_str = ""
+    if(config.config.format_lens ~= nil) then
+      display_str = config.config.format_lens(query)
+    else
+      create_string(query.counting)
+    end
     if not (display_str == "") then
-      local vline = { {string.rep(" ", query.rangeStart.character) .. display_str, "LspLens"} }
+      local vline = {string.rep(" ", query.rangeStart.character) .. display_str, "LspLens"}
       table.insert(virt_lines, vline)
       vim.api.nvim_buf_set_extmark(bufnr, ns_id, query.rangeStart.line, 0, {
         virt_lines = virt_lines,
